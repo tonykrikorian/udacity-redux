@@ -1,5 +1,5 @@
 //Code Library
-function createStore() {
+function createStore(reducer) {
   let state;
   let listeners = [];
 
@@ -13,7 +13,7 @@ function createStore() {
   };
 
   const dispatch = action => {
-    state = todos(state, action);
+    state = reducer(state, action);
     listeners.forEach(listener => listener());
   };
 
@@ -37,3 +37,14 @@ function todos(state = [], action) {
 
   return state;
 }
+
+const store = createStore(todos);
+store.subscribe(() => console.log("This is the new state", store.getState()));
+store.dispatch({
+  type: "ADD_TODO",
+  todo: {
+    id: 0,
+    name: "Learn redux",
+    complete: false
+  }
+});
