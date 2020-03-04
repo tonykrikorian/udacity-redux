@@ -24,11 +24,6 @@ function createStore(reducer) {
   };
 }
 
-const store = createStore();
-store.subscribe(() => {
-  console.log("The new state is", store.getState());
-});
-
 //App Code
 function todos(state = [], action) {
   if (action.type === "ADD_TODO") {
