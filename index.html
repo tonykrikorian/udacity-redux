@@ -19,6 +19,13 @@
       <ul id="goals"></ul>
     </div>
     <script>
+      function generateId() {
+        return (
+          Math.random()
+            .toString(36)
+            .substring(2) + new Date().getTime().toString(36)
+        );
+      }
       //Code Library
       function createStore(reducer) {
         let state;
@@ -85,6 +92,7 @@
           id
         };
       }
+
       //App Code
       function todos(state = [], action) {
         switch (action.type) {
@@ -121,60 +129,116 @@
           goals: goals(state.goals, action)
         };
       }
+      // const store = createStore(app);
+      // store.subscribe(() =>
+      //   console.log("This is the new state", store.getState())
+      // );
+
       const store = createStore(app);
-      store.subscribe(() =>
-        console.log("This is the new state", store.getState())
-      );
 
-      store.dispatch(
-        addTodoAction({
-          id: 0,
-          name: "Learn redux",
-          complete: false
-        })
-      );
+      store.subscribe(() => {
+        document.getElementById("goals").innerHTML = "";
+        document.getElementById("todos").innerHTML = "";
 
-      store.dispatch(
-        addTodoAction({
-          id: 1,
-          name: "Learn React",
-          complete: false
-        })
-      );
+        const { goals, todos } = store.getState();
+        todos.forEach(addTodoToDOM);
+        goals.forEach(addGoalToDOM);
+      });
 
-      store.dispatch(
-        addTodoAction({
-          id: 2,
-          name: "Learn Linux",
-          complete: false
-        })
-      );
+      // store.dispatch(
+      //   addTodoAction({
+      //     id: 0,
+      //     name: "Learn redux",
+      //     complete: false
+      //   })
+      // );
 
-      store.dispatch(removeTodoAction(2));
+      // store.dispatch(
+      //   addTodoAction({
+      //     id: 1,
+      //     name: "Learn React",
+      //     complete: false
+      //   })
+      // );
 
-      store.dispatch(removeTodoAction(1));
+      // store.dispatch(
+      //   addTodoAction({
+      //     id: 2,
+      //     name: "Learn Linux",
+      //     complete: false
+      //   })
+      // );
 
-      store.dispatch(removeTodoAction(1));
+      // store.dispatch(removeTodoAction(2));
 
-      store.dispatch(toggleTodoAction(0));
+      // store.dispatch(removeTodoAction(1));
 
-      store.dispatch(toggleTodoAction(1));
+      // store.dispatch(removeTodoAction(1));
 
-      store.dispatch(
-        addGoalAction({
-          id: 0,
-          name: "Learn Desaign Patterns"
-        })
-      );
+      // store.dispatch(toggleTodoAction(0));
 
-      store.dispatch(
-        addGoalAction({
-          id: 1,
-          name: "Learn SQL"
-        })
-      );
+      // store.dispatch(toggleTodoAction(1));
 
-      store.dispatch(removeGoalAction(0));
+      // store.dispatch(
+      //   addGoalAction({
+      //     id: 0,
+      //     name: "Learn Desaign Patterns"
+      //   })
+      // );
+
+      // store.dispatch(
+      //   addGoalAction({
+      //     id: 1,
+      //     name: "Learn SQL"
+      //   })
+      // );
+
+      // store.dispatch(removeGoalAction(0));
+
+      function addTodo() {
+        const input = document.getElementById("todo");
+        const name = input.value;
+        input.value = "";
+        store.dispatch(
+          addTodoAction({ name, complete: false, id: generateId() })
+        );
+      }
+      function addGoal() {
+        const input = document.getElementById("goal");
+        const name = input.value;
+        input.value = "";
+
+        store.dispatch(
+          addGoalAction({
+            id: generateId(),
+            name
+          })
+        );
+      }
+
+      function addTodoToDOM(todo) {
+        const node = document.createElement("li");
+        const text = document.createTextNode(todo.name);
+        node.appendChild(text);
+
+        node.style.textDecoration = todo.complete ? "line-through" : "none";
+
+        node.addEventListener("click", () =>
+          store.dispatch(toggleTodoAction(todo.id))
+        );
+
+        document.getElementById("todos").appendChild(node);
+      }
+      function addGoalToDOM(goal) {
+        const node = document.createElement("li");
+        const text = document.createTextNode(goal.name);
+        node.appendChild(text);
+
+        document.getElementById("goals").appendChild(node);
+      }
+
+      document.getElementById("todoBtn").addEventListener("click", addTodo);
+      document.getElementById("goalBtn").addEventListener("click", addGoal);
     </script>
   </body>
 </html>
