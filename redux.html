@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Udacity Add Goals</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"></script>
   </head>
   <body>
     <div>
@@ -27,30 +28,6 @@
         );
       }
       //Code Library
-      function createStore(reducer) {
-        let state;
-        let listeners = [];
-
-        const getState = () => state;
-
-        const subscribe = listener => {
-          listeners.push(listener);
-          return () => {
-            listeners = listeners.filter(l => l !== listener);
-          };
-        };
-
-        const dispatch = action => {
-          state = reducer(state, action);
-          listeners.forEach(listener => listener());
-        };
-
-        return {
-          getState,
-          subscribe,
-          dispatch
-        };
-      }
 
       const ADD_TODO = "ADD_TODO";
       const REMOVE_TODO = "REMOVE_TODO";
@@ -134,7 +111,8 @@
       //   console.log("This is the new state", store.getState())
       // );
 
-      const store = createStore(app);
+      //Lamada a the real Redux
+      const store = Redux.createStore(app);
 
       store.subscribe(() => {
         document.getElementById("goals").innerHTML = "";
