@@ -171,11 +171,15 @@
       class Todos extends React.Component {
         addItem = e => {
           e.preventDefault();
-          const name = this.input.value;
-          this.input.value = "";
-          this.props.store.dispatch(
-            addTodoAction({ name, complete: false, id: generateId() })
-          );
+
+          return API.saveTodo(this.input.value)
+            .then(todo => {
+              this.props.store.dispatch(addTodoAction(todo));
+              this.input.value = "";
+            })
+            .catch(() => {
+              alert("There was an error. Try again.");
+            });
         };
 
         //Add optimistic UI Update, primero actualizar el frontend y luego el backend
@@ -187,8 +191,13 @@
           });
         };
 
+        //Add optimistic UI Update, primero actualizar el frontend y luego el backend
         toggleItem = id => {
           this.props.store.dispatch(toggleTodoAction(id));
+          return API.saveTodoToggle(id).catch(() => {
+            this.props.store.dispatch(toggleTodoAction(id));
+            alert("An error has ocurred. Try Again");
+          });
         };
         render() {
           return (
@@ -219,6 +228,11 @@
         };
         removeItem = goal => {
           this.props.store.dispatch(removeGoalAction(goal.id));
+
+          return API.deleteGoal(goal.id).catch(() => {
+            this.props.store.dispatch(addGoalAction(goal));
+            alert("An error has ocurred. Try Again");
+          });
         };
         render() {
           return (
