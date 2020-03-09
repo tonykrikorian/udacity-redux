@@ -178,9 +178,13 @@
           );
         };
 
+        //Add optimistic UI Update, primero actualizar el frontend y luego el backend
         removeItem = todo => {
-          console.log({ todo });
           this.props.store.dispatch(removeTodoAction(todo.id));
+          return API.deleteTodo(todo.id).catch(() => {
+            this.props.store.dispatch(addTodoAction(todo));
+            alert("An error has ocurred. Try Again");
+          });
         };
 
         toggleItem = id => {
