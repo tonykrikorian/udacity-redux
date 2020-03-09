@@ -65,6 +65,16 @@
         };
       }
 
+      function handleDeleteTodo(todo) {
+        return dispatch => {
+          dispatch(removeTodoAction(todo.id));
+          return API.deleteTodo(todo.id).catch(() => {
+            this.props.store.dispatch(addTodoAction(todo));
+            alert("An error has ocurred. Try Again");
+          });
+        };
+      }
+
       function receiveDataAction(todos, goals) {
         return {
           type: RECEIVE_DATA,
@@ -143,9 +153,17 @@
         }
         return next(action);
       };
+
+      //Middleware Async (Thunk escrito por nosotros, debemos usar el de Redux)
+      const thunk = store => next => action => {
+        if (typeof action === "function") {
+          return action(store.dispatch);
+        }
+        return next(action);
+      };
       const store = Redux.createStore(
         Redux.combineReducers({ todos, goals, loading }),
-        Redux.applyMiddleware(checker, greatGoal, logger)
+        Redux.applyMiddleware(ReduxThunk.default, checker, greatGoal, logger)
       );
     </script>
     <script type="text/babel">
@@ -185,11 +203,7 @@
 
         //Add optimistic UI Update, primero actualizar el frontend y luego el backend
         removeItem = todo => {
-          this.props.store.dispatch(removeTodoAction(todo.id));
-          return API.deleteTodo(todo.id).catch(() => {
-            this.props.store.dispatch(addTodoAction(todo));
-            alert("An error has ocurred. Try Again");
-          });
+          this.props.store.dispatch(handleDeleteTodo(todo));
         };
 
         //Add optimistic UI Update, primero actualizar el frontend y luego el backend
