@@ -65,6 +65,8 @@
         };
       }
 
+      //Usar este patron para hacer la comunicación con el server, primero
+      //actualiza la UI y cuando resuleve el request ejecuta todo
       function handleDeleteTodo(todo) {
         return dispatch => {
           dispatch(removeTodoAction(todo.id));
@@ -74,7 +76,52 @@
           });
         };
       }
+      //Add Goal Action creator
 
+      function handleAddGoal(name, cb) {
+        return dispatch => {
+          return API.saveGoal(name)
+            .then(goal => {
+              dispatch(addGoalAction(goal));
+              cb();
+            })
+            .catch(() => alert("There was an error. Try again."));
+        };
+      }
+
+      function handleDeleteGoal(goal) {
+        return dispatch => {
+          dispatch(removeGoalAction(goal.id));
+
+          return API.deleteGoal(goal.id).catch(() => {
+            dispatch(addGoalAction(goal));
+            alert("An error occurred. Try again.");
+          });
+        };
+      }
+
+      function handleAddTodo(name, cb) {
+        return dispatch => {
+          return API.saveTodo(name)
+            .then(todo => {
+              dispatch(addTodoAction(todo));
+              cb();
+            })
+            .catch(() => {
+              alert("There was an error. Try again.");
+            });
+        };
+      }
+
+      function handleToggle(id) {
+        return dispatch => {
+          dispatch(toggleTodoAction(id));
+          return API.saveTodoToggle(id).catch(() => {
+            dispatch(toggleTodoAction(id));
+            alert("An error has ocurred. Try Again");
+          });
+        };
+      }
       function receiveDataAction(todos, goals) {
         return {
           type: RECEIVE_DATA,
@@ -191,14 +238,9 @@
         addItem = e => {
           e.preventDefault();
 
-          return API.saveTodo(this.input.value)
-            .then(todo => {
-              this.props.store.dispatch(addTodoAction(todo));
-              this.input.value = "";
-            })
-            .catch(() => {
-              alert("There was an error. Try again.");
-            });
+          this.props.store.dispatch(
+            handleAddTodo(this.input.value, () => (this.input.value = ""))
+          );
         };
 
         //Add optimistic UI Update, primero actualizar el frontend y luego el backend
@@ -208,11 +250,7 @@
 
         //Add optimistic UI Update, primero actualizar el frontend y luego el backend
         toggleItem = id => {
-          this.props.store.dispatch(toggleTodoAction(id));
-          return API.saveTodoToggle(id).catch(() => {
-            this.props.store.dispatch(toggleTodoAction(id));
-            alert("An error has ocurred. Try Again");
-          });
+          this.props.store.dispatch(handleToggle(id));
         };
         render() {
           return (
@@ -237,22 +275,12 @@
       class Goals extends React.Component {
         addItem = e => {
           e.preventDefault();
-          return API.saveGoal(this.input.value)
-            .then(goal => {
-              this.props.store.dispatch(addGoalAction(goal));
-              this.input.value = "";
-            })
-            .catch(() => {
-              alert("There was an error. Try again.");
-            });
+          this.props.store.dispatch(
+            handleAddGoal(this.input.value, () => (this.input.value = ""))
+          );
         };
         removeItem = goal => {
-          this.props.store.dispatch(removeGoalAction(goal.id));
-
-          return API.deleteGoal(goal.id).catch(() => {
-            this.props.store.dispatch(addGoalAction(goal));
-            alert("An error has ocurred. Try Again");
-          });
+          this.props.store.dispatch(handleDeleteGoal(goal));
         };
         render() {
           return (
