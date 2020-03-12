@@ -280,7 +280,32 @@
         }
       }
 
-      ReactDOM.render(<App store={store} />, document.getElementById("app"));
+      class ConnectedApp extends React.Component {
+        render() {
+          <Context.Consumer>
+            {store => {
+              <App store={store} />;
+            }}
+          </Context.Consumer>;
+        }
+      }
+      const Context = React.createContext();
+
+      class Provider extends React.Component {
+        render() {
+          return (
+            <Context.Provider value={this.props.store}>
+              {this.props.children}
+            </Context.Provider>
+          );
+        }
+      }
+      ReactDOM.render(
+        <Provider store={store}>
+          <App />
+        </Provider>,
+        document.getElementById("app")
+      );
     </script>
   </body>
 </html>
